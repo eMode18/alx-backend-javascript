@@ -1,0 +1,1 @@
+In this lesson, we learn about ES6 promises and how to avoid the callback hell through method chaining using .then and .catch depending on whether a promise has be resolved(fulfilled) or rejected(error).
