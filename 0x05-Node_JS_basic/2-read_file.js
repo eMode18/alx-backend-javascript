@@ -1,39 +1,43 @@
 const fs = require('fs');
 
-function countStudents(filePath) {
+function countStudents(fileName) {
+  const studentRecords = {};
+  const fieldCounts = {};
+  let totalRecords = 0;
+
   try {
-    // Read the file synchronously
-    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const fileContent = fs.readFileSync(fileName, 'utf-8');
+    const lines = fileContent.toString().split('\n');
 
-    // Split the content into lines
-    const lines = fileContent.split('\n');
+    for (let i = 0; i < lines.length; i += 1) {
+      if (lines[i]) {
+        totalRecords += 1;
+        const recordFields = lines[i].toString().split(',');
 
-    // Initialize counters for CS and SWE students
-    let csCount = 0;
-    let sweCount = 0;
-    const csStudents = [];
-    const sweStudents = [];
+        if (Object.prototype.hasOwnProperty.call(studentRecords, recordFields[3])) {
+          studentRecords[recordFields[3]].push(recordFields[0]);
+        } else {
+          studentRecords[recordFields[3]] = [recordFields[0]];
+        }
 
-    // Process each line (excluding empty lines)
-    for (const line of lines) {
-      if (line.trim() !== '') {
-        const [firstName, field] = line.split(',');
-        if (field === 'CS') {
-          csCount++;
-          csStudents.push(firstName);
-        } else if (field === 'SWE') {
-          sweCount++;
-          sweStudents.push(firstName);
+        if (Object.prototype.hasOwnProperty.call(fieldCounts, recordFields[3])) {
+          fieldCounts[recordFields[3]] += 1;
+        } else {
+          fieldCounts[recordFields[3]] = 1;
         }
       }
     }
 
-    // Log the results
-    console.log(`Number of students: ${csCount + sweCount}`);
-    console.log(`Number of students in CS: ${csCount}. List: ${csStudents.join(', ')}`);
-    console.log(`Number of students in SWE: ${sweCount}. List: ${sweStudents.join(', ')}`);
+    const totalStudents = totalRecords - 1;
+    console.log(`Number of students: ${totalStudents}`);
+
+    for (const [field, count] of Object.entries(fieldCounts)) {
+      if (field !== 'field') {
+        console.log(`Number of students in ${field}: ${count}. List: ${studentRecords[field].join(', ')}`);
+      }
+    }
   } catch (error) {
-    console.error('Cannot load the database');
+    throw new Error('Cannot load the database');
   }
 }
 
